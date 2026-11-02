@@ -81,6 +81,7 @@ export function resolveReaEvaluation(prop: CloudProposal): EnterpriseEvaluationR
     status: 'error',
     origin_detected: 'Sin evaluación REA registrada',
     detected_configs: [],
+    system_description: 'No hay una descripción general disponible para esta evaluación.',
     system_analysis: 'La propuesta todavía no tiene una evaluación REA persistida en el backend.',
     architecture_pattern: 'Sin evaluación',
     migration_strategy: 'Pendiente',
@@ -114,6 +115,7 @@ export default function AwsReaTechSheetModal({ proposal, onClose }: AwsReaTechSh
         </header>
 
         <main style={{ padding: '22px 26px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <section style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: 12, padding: '14px 18px' }}><div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}><FileText size={16} color="#2563eb" /><strong>Descripción general del sistema</strong></div><p style={{ margin: 0, fontSize: 13, color: '#1e3a8a', lineHeight: 1.55 }}>{reaData.system_description || reaData.system_analysis}</p></section>
           <section style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 12, padding: '14px 18px' }}><div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 6 }}><Cpu size={16} color="#2563eb" /><strong>Dictamen del motor REA</strong></div><p style={{ margin: 0, fontSize: 13, color: '#334155', lineHeight: 1.55 }}>{reaData.system_analysis}</p></section>
 
           <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))', gap: 10 }}>{[['Origen', reaData.origin_detected], ['Arquitectura', reaData.architecture_pattern], ['Seguridad', `${security.score}/100 · ${security.postureLabel}`], ['Presupuesto', `$${proposal.monthlyBudget.toFixed(2)}/mes`]].map(([label, value]) => <div key={label} style={{ border: '1px solid #e2e8f0', borderRadius: 10, padding: '10px 14px' }}><span style={{ display: 'block', fontSize: 11, color: '#64748b', fontWeight: 600 }}>{label}</span><strong style={{ fontSize: 13 }}>{value}</strong></div>)}</section>

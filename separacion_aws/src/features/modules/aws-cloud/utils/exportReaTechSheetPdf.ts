@@ -255,8 +255,13 @@ export function exportReaTechSheetPdf(
   // 1. DICTAMEN DE EVALUACIÓN DE ARQUITECTURA (MOTOR REA)
   // =========================================================
   ctx.font = '500 16px "Inter", "Segoe UI", Arial, sans-serif';
+  const descriptionLines = wrapText(
+    ctx,
+    reaData.system_description || reaData.system_analysis,
+    CONTENT_W - 44
+  );
   const analysisLines = wrapText(ctx, reaData.system_analysis, CONTENT_W - 44);
-  const analysisBoxH = 56 + analysisLines.length * 24;
+  const analysisBoxH = 88 + (descriptionLines.length + analysisLines.length) * 24;
 
   drawRoundedRect(ctx, MARGIN_X, y, CONTENT_W, analysisBoxH, 14, '#f8fafc', '#e2e8f0', 1.5);
   ctx.font = 'bold 18px "Inter", "Segoe UI", Arial, sans-serif';
@@ -265,8 +270,18 @@ export function exportReaTechSheetPdf(
 
   ctx.font = '400 15.5px "Inter", "Segoe UI", Arial, sans-serif';
   ctx.fillStyle = '#334155';
+  ctx.font = '600 15px "Inter", "Segoe UI", Arial, sans-serif';
+  ctx.fillText('Descripción general del sistema:', MARGIN_X + 22, y + 60);
+  ctx.font = '400 15.5px "Inter", "Segoe UI", Arial, sans-serif';
+  descriptionLines.forEach((line, i) => {
+    ctx.fillText(line, MARGIN_X + 22, y + 84 + i * 24);
+  });
+  const analysisLabelY = y + 84 + descriptionLines.length * 24;
+  ctx.font = '600 15px "Inter", "Segoe UI", Arial, sans-serif';
+  ctx.fillText('Dictamen técnico:', MARGIN_X + 22, analysisLabelY);
+  ctx.font = '400 15.5px "Inter", "Segoe UI", Arial, sans-serif';
   analysisLines.forEach((line, i) => {
-    ctx.fillText(line, MARGIN_X + 22, y + 60 + i * 24);
+    ctx.fillText(line, MARGIN_X + 22, analysisLabelY + 24 + i * 24);
   });
 
   y += analysisBoxH + 20;

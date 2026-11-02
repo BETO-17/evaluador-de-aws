@@ -50,6 +50,7 @@ def _ensure_freemium_columns_exist() -> None:
             "ALTER TABLE users ADD COLUMN token_version INTEGER NOT NULL DEFAULT 0",
             "ALTER TABLE proposal_rea_evaluations ADD COLUMN ai_generated BOOLEAN NOT NULL DEFAULT 0",
             "ALTER TABLE proposal_rea_evaluations ADD COLUMN ai_provider VARCHAR(80) NULL",
+            "ALTER TABLE proposal_rea_evaluations ADD COLUMN system_description TEXT NULL",
         ):
             try:
                 conn.execute(text(ddl))

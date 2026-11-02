@@ -955,6 +955,10 @@ export default function AwsProjectAnalyzer({ onApplyToProposal }: AwsProjectAnal
               </div>
             </div>
 
+            <p style={{ margin: '0 0 10px', fontSize: 13, color: '#bfdbfe', lineHeight: 1.5 }}>
+              <strong>Descripción general:</strong>{' '}
+              {analysisResult.enterpriseEvaluation?.system_description || analysisResult.enterpriseEvaluation?.system_analysis || analysisResult.suggestedDescription}
+            </p>
             <p style={{ margin: 0, fontSize: 13, color: '#e2e8f0', lineHeight: 1.5 }}>
               {analysisResult.enterpriseEvaluation?.system_analysis || analysisResult.suggestedDescription}
             </p>

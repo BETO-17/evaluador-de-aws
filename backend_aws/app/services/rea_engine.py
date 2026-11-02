@@ -38,6 +38,7 @@ tráfico {traffic_tier}.
 
 Devuelve SOLO JSON válido con esta estructura:
 {{
+  "system_description": "descripciÃ³n general de quÃ© trata el sistema segÃºn la evidencia",
   "system_analysis": "explicación técnica concreta del proyecto detectado",
   "architecture_pattern": "patrón recomendado",
   "migration_strategy": "Rehost | Replatform | Refactor | Repurchase | Retain",
@@ -84,7 +85,15 @@ def build_rea_evaluation(
         return result
 
     fallback["ai_generated"] = False
-    fallback["ai_provider"] = "REA Heuristic Engine (IA no disponible)"
+    if settings.CLAUDE_API_KEY or settings.GEMINI_API_KEY:
+        fallback["ai_provider"] = "REA Heuristic Engine (respuesta IA no interpretable)"
+        fallback["ai_fallback_reason"] = (
+            "El proveedor de IA respondió, pero su contenido no pudo convertirse "
+            "en un objeto JSON válido."
+        )
+    else:
+        fallback["ai_provider"] = "REA Heuristic Engine (IA no configurada)"
+        fallback["ai_fallback_reason"] = "No hay una API key de IA configurada en el backend."
     return fallback
 
 
@@ -97,7 +106,33 @@ def _normalize_evidence(evidence: Dict[str, Any]) -> Dict[str, Any]:
         "has_docker": bool(evidence.get("has_docker", False)),
         "total_files": max(int(evidence.get("total_files", 0) or 0), 0),
         "detected_configs": [str(item) for item in evidence.get("detected_configs", []) if str(item).strip()],
+        "project_description": str(evidence.get("project_description") or "").strip()[:1600],
     }
+
+
+def _build_system_description(
+    source_name: str,
+    evidence: Dict[str, Any],
+    custom_notes: Optional[str],
+) -> str:
+    """Genera una descripción honesta cuando la IA no aporta una síntesis."""
+    project_description = str(evidence.get("project_description") or "").strip()
+    if project_description:
+        return project_description[:1600]
+
+    languages = ", ".join(evidence.get("languages") or []) or "tecnologías no identificadas"
+    frameworks = ", ".join(evidence.get("frameworks") or []) or "framework no identificado"
+    databases = ", ".join(evidence.get("databases") or []) or "sin base de datos identificada"
+    system_kind = "aplicación web o servicio backend" if evidence.get("frameworks") else "sistema de software"
+    description = (
+        f"{source_name} es un {system_kind} construido con {languages} y {frameworks}. "
+        f"La evidencia disponible muestra persistencia en {databases}"
+        f"{' y uso de contenedores Docker' if evidence.get('has_docker') else ''}. "
+        "El propósito funcional específico no está descrito explícitamente en los archivos de configuración analizados."
+    )
+    if custom_notes and custom_notes.strip():
+        description += f" Requerimientos declarados: {custom_notes.strip()[:500]}."
+    return description[:1600]
 
 
 def _heuristic_service_codes(evidence: Dict[str, Any]) -> Tuple[List[str], List[str], List[str]]:
@@ -156,6 +191,7 @@ def _build_heuristic_evaluation(
         "status": "success",
         "origin_detected": f"Proyecto auditado ({source_name})",
         "detected_configs": evidence["detected_configs"],
+        "system_description": _build_system_description(source_name, evidence, custom_notes),
         "system_analysis": analysis,
         "architecture_pattern": "Microservicios contenedorizados Multi-AZ" if evidence["has_docker"] else "Arquitectura web empresarial multi-capa",
         "migration_strategy": "Replatform",
@@ -178,7 +214,7 @@ def _apply_ai_plan(
 ) -> Dict[str, Any]:
     """Combina el razonamiento de IA con precios y catálogo validados localmente."""
     result = dict(fallback)
-    for key in ("system_analysis", "architecture_pattern", "migration_strategy", "well_architected_notes"):
+    for key in ("system_description", "system_analysis", "architecture_pattern", "migration_strategy", "well_architected_notes"):
         value = plan.get(key)
         if isinstance(value, str) and value.strip():
             result[key] = value.strip()
@@ -283,7 +319,7 @@ def _call_gemini(prompt: str, context: str) -> Optional[Dict[str, Any]]:
             config=types.GenerateContentConfig(response_mime_type="application/json", temperature=0.2),
         )
         if response and response.text:
-            return _parse_ai_json(response.text)
+            return _parse_ai_json(response.text, provider="Gemini")
     except Exception as exc:
         logger.warning("Gemini no pudo generar el plan REA: %s", exc)
     return None
@@ -316,13 +352,59 @@ def _call_claude(prompt: str, context: str) -> Optional[Dict[str, Any]]:
             if not text.strip():
                 logger.warning("Claude devolvió una respuesta sin contenido de texto.")
                 return None
-            return _parse_ai_json(text)
+            return _parse_ai_json(text, provider="Claude")
     except Exception as exc:
         logger.warning("Claude no pudo generar el plan REA: %s", exc)
     return None
 
 
-def _parse_ai_json(raw_text: str) -> Optional[Dict[str, Any]]:
+def _parse_ai_json(raw_text: str, provider: str = "IA") -> Optional[Dict[str, Any]]:
+    """Interpreta JSON puro, Markdown o texto adicional devuelto por la IA.
+
+    Algunos proveedores envuelven el JSON en Markdown o agregan una frase
+    antes/después del objeto. ``JSONDecoder.raw_decode`` permite recuperar un
+    objeto válido sin ejecutar ni modificar contenido arbitrario.
+    """
+    text = raw_text.strip().lstrip("\ufeff")
+    if not text:
+        logger.warning("%s devolvió una respuesta vacía para el plan REA.", provider)
+        return None
+
+    # Elimina únicamente los delimitadores de un bloque Markdown.
+    lines = text.splitlines()
+    if lines and lines[0].strip().startswith("```"):
+        lines = lines[1:]
+        if lines and lines[-1].strip().startswith("```"):
+            lines = lines[:-1]
+        text = "\n".join(lines).strip()
+
+    try:
+        parsed = json.loads(text)
+        if isinstance(parsed, dict):
+            return parsed
+    except json.JSONDecodeError:
+        pass
+
+    # Recupera el primer objeto JSON válido aunque exista texto antes o después.
+    decoder = json.JSONDecoder()
+    for start, character in enumerate(text):
+        if character != "{":
+            continue
+        try:
+            parsed, _end = decoder.raw_decode(text[start:])
+        except json.JSONDecodeError:
+            continue
+        if isinstance(parsed, dict):
+            return parsed
+
+    logger.warning(
+        "%s devolvió contenido que no pudo interpretarse como JSON válido para el plan REA.",
+        provider,
+    )
+    return None
+
+
+def _parse_ai_json_legacy(raw_text: str) -> Optional[Dict[str, Any]]:
     """Acepta JSON puro y JSON envuelto en bloques Markdown de la IA."""
     text = raw_text.strip()
     if text.startswith("```"):

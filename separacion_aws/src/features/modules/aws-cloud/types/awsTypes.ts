@@ -209,6 +209,7 @@ export interface EnterpriseEvaluationResponse {
   status: 'success' | 'error';
   origin_detected: string;
   detected_configs: string[];
+  system_description: string;
   system_analysis: string;
   architecture_pattern: string;
   migration_strategy: string;
@@ -223,6 +224,7 @@ export interface EnterpriseEvaluationResponse {
   };
   ai_generated?: boolean;
   ai_provider?: string;
+  ai_fallback_reason?: string;
 }
 
 export interface EvaluationOptions {

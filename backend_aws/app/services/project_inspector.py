@@ -15,6 +15,7 @@ INTEGRACIÓN FRONTEND / BD:
 """
 
 import io
+import json
 import os
 import zipfile
 from typing import Any, Dict, List, Optional, Set
@@ -50,6 +51,8 @@ CONFIG_MANIFEST_NAMES: Set[str] = {
     ".env.example",
 }
 
+DESCRIPTION_FILE_NAMES: Set[str] = {"readme.md", "readme.txt", "readme.rst"}
+
 
 class ProjectInspectionError(RuntimeError):
     """Indica que no fue posible obtener evidencia real del proyecto."""
@@ -77,6 +80,7 @@ def inspect_zip_bytes(zip_bytes: bytes) -> Dict[str, Any]:
     frameworks: Set[str] = set()
     databases: Set[str] = set()
     detected_configs: List[str] = []
+    project_description = ""
     has_docker: bool = False
     total_files: int = 0
 
@@ -116,10 +120,12 @@ def inspect_zip_bytes(zip_bytes: bytes) -> Dict[str, Any]:
 
             # [REGLA DE SEGURIDAD - PROTECCIÓN ZIP BOMB]:
             # Solo se leen en memoria manifiestos de texto menores a 250 KB.
-            if base in CONFIG_MANIFEST_NAMES and info.file_size < 250_000:
+            if (base in CONFIG_MANIFEST_NAMES or base in DESCRIPTION_FILE_NAMES) and info.file_size < 250_000:
                 try:
-                    content = zf.read(info.filename).decode("utf-8", errors="ignore").lower()
-                    _extract_dependencies_from_text(content, frameworks, databases)
+                    content = zf.read(info.filename).decode("utf-8", errors="ignore")
+                    _extract_dependencies_from_text(content.lower(), frameworks, databases)
+                    if not project_description and (base in DESCRIPTION_FILE_NAMES or base == "package.json"):
+                        project_description = _extract_project_description(content, base)
                 except Exception:
                     pass
 
@@ -130,6 +136,7 @@ def inspect_zip_bytes(zip_bytes: bytes) -> Dict[str, Any]:
         "has_docker": has_docker,
         "total_files": total_files,
         "detected_configs": detected_configs,
+        "project_description": project_description,
     }
 
 
@@ -169,6 +176,24 @@ def _extract_dependencies_from_text(
         databases.add("Redis (Amazon ElastiCache)")
 
 
+def _extract_project_description(content: str, filename: str = "") -> str:
+    """Obtiene una descripción breve de README o metadatos de package.json."""
+    if filename == "package.json":
+        try:
+            description = json.loads(content).get("description")
+            if isinstance(description, str) and description.strip():
+                return description.strip()[:1600]
+        except (TypeError, ValueError):
+            pass
+
+    for raw_line in content.splitlines():
+        line = raw_line.strip().strip("#*- ").strip()
+        if not line or line.startswith(("![]", "```", "<", "http://", "https://")):
+            continue
+        return line[:1600]
+    return ""
+
+
 def inspect_document_text(content: str) -> Dict[str, Any]:
     """Extrae evidencia técnica de un documento sin ejecutar heurísticas en React."""
     normalized = content.lower()
@@ -200,6 +225,7 @@ def inspect_document_text(content: str) -> Dict[str, Any]:
         "has_docker": "docker" in normalized,
         "total_files": 1,
         "detected_configs": detected_configs,
+        "project_description": _extract_project_description(content),
     }
 
 
@@ -252,6 +278,7 @@ async def inspect_github_repository(
             frameworks: Set[str] = set()
             databases: Set[str] = set()
             detected_configs: List[str] = []
+            project_description = str(repo_data.get("description") or "").strip()[:1600]
             has_docker = False
 
             for item in files:
@@ -277,11 +304,15 @@ async def inspect_github_repository(
 
             for item in root_items:
                 base = os.path.basename(str(item.get("name", "")).lower())
-                if base not in CONFIG_MANIFEST_NAMES or not item.get("download_url"):
+                if base not in CONFIG_MANIFEST_NAMES and base not in DESCRIPTION_FILE_NAMES:
+                    continue
+                if not item.get("download_url"):
                     continue
                 manifest_response = await client.get(item["download_url"], headers=headers)
                 if manifest_response.status_code == 200 and len(manifest_response.text) <= 250_000:
                     _extract_dependencies_from_text(manifest_response.text.lower(), frameworks, databases)
+                    if not project_description and base in DESCRIPTION_FILE_NAMES:
+                        project_description = _extract_project_description(manifest_response.text, base)
 
             return {
                 "languages": sorted(languages),
@@ -290,6 +321,7 @@ async def inspect_github_repository(
                 "has_docker": has_docker,
                 "total_files": len(files),
                 "detected_configs": sorted(detected_configs),
+                "project_description": project_description,
             }
     except ProjectInspectionError:
         raise

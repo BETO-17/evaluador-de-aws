@@ -51,6 +51,7 @@ def serialize_proposal(proposal: CloudProposal) -> Dict[str, Any]:
             "status": r.status,
             "origin_detected": r.origin_detected,
             "detected_configs": r.detected_configs,
+            "system_description": getattr(r, "system_description", None) or r.system_analysis,
             "system_analysis": r.system_analysis,
             "architecture_pattern": r.architecture_pattern,
             "migration_strategy": r.migration_strategy,
@@ -215,6 +216,7 @@ async def create_proposal(
         status=rea_eval.get("status", "success"),
         origin_detected=rea_eval.get("origin_detected", f"Proyecto ({payload.solution_name})"),
         detected_configs=rea_eval.get("detected_configs", []),
+        system_description=rea_eval.get("system_description") or rea_eval.get("system_analysis", payload.description),
         system_analysis=rea_eval.get("system_analysis", payload.description),
         architecture_pattern=rea_eval.get(
             "architecture_pattern",
@@ -354,6 +356,8 @@ async def update_proposal(
             rea_row.status = rea_data.get("status", rea_row.status)
             rea_row.origin_detected = rea_data.get("origin_detected", rea_row.origin_detected)
             rea_row.detected_configs = rea_data.get("detected_configs", rea_row.detected_configs or [])
+            if "system_description" in rea_data:
+                rea_row.system_description = rea_data.get("system_description") or rea_row.system_analysis
             rea_row.system_analysis = rea_data.get("system_analysis", rea_row.system_analysis)
             rea_row.architecture_pattern = rea_data.get("architecture_pattern", rea_row.architecture_pattern)
             rea_row.migration_strategy = rea_data.get("migration_strategy", rea_row.migration_strategy)

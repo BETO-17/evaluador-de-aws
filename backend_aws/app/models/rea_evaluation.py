@@ -44,6 +44,7 @@ class ProposalReaEvaluation(Base):
     status = Column(String(20), nullable=False, default="success")
     origin_detected = Column(String(160), nullable=False)
     detected_configs = Column(JSON, nullable=False, default=list)
+    system_description = Column(Text, nullable=True)
     system_analysis = Column(Text, nullable=False)
     architecture_pattern = Column(String(180), nullable=False)
     migration_strategy = Column(String(120), nullable=False, default="Replatform (Lift, Tinker & Shift)")

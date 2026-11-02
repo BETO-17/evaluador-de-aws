@@ -16,6 +16,7 @@ INTEGRACIÓN FRONTEND / BD:
 """
 
 from datetime import datetime, timezone
+from textwrap import wrap
 from typing import Any, Dict, List
 
 
@@ -62,6 +63,7 @@ def generate_rea_tech_sheet_pdf(
         f"Patron AWS:       {rea_data.get('architecture_pattern', '3-Tier High Availability')}",
         f"Estrategia 6R:    {rea_data.get('migration_strategy', 'Replatform (Lift, Tinker & Shift)')}",
         f"Servicios AWS:    {', '.join(proposal_data.get('selected_services', []))}",
+        "Descripcion General del Sistema:",
         "----------------------------------------------------------------------",
         "2. POSTURA DE SEGURIDAD E IDENTIDAD IAM (0 - 100 PTS)",
         f"Puntaje Obtenido: {security_data.get('security_score', 100)} / 100 pts",
@@ -75,6 +77,12 @@ def generate_rea_tech_sheet_pdf(
         "----------------------------------------------------------------------",
         "3. ESCENARIOS FINOPS COMPARATIVOS (730 HORAS/MES)",
     ]
+
+    system_description = str(
+        rea_data.get("system_description") or rea_data.get("system_analysis") or "Sin descripción disponible."
+    )
+    description_index = lines.index("Descripcion General del Sistema:") + 1
+    lines[description_index:description_index] = [f"  {line}" for line in wrap(system_description, width=100)]
 
     for sc in rea_data.get("scenarios", []):
         sc_type = sc.get("scenario_type", "Scenario")

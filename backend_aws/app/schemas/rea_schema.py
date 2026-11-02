@@ -73,6 +73,7 @@ class TechnicalEvidenceSchema(BaseModel):
     databases: List[str]
     has_docker: bool
     total_files: int
+    project_description: Optional[str] = None
 
 
 class ReaServiceItemSchema(BaseModel):
@@ -120,6 +121,7 @@ class EnterpriseEvaluationResponse(BaseModel):
     status: str = "success"
     origin_detected: str
     detected_configs: List[str]
+    system_description: str = ""
     system_analysis: str
     architecture_pattern: str
     migration_strategy: str
@@ -129,3 +131,4 @@ class EnterpriseEvaluationResponse(BaseModel):
     subscription_quota: Optional[Dict[str, Any]] = None
     ai_generated: bool = False
     ai_provider: str = "REA Heuristic Engine"
+    ai_fallback_reason: Optional[str] = None
