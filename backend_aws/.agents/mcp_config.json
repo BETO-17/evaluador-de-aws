@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "clouddiagnostix-drawio-aws4": {
+      "command": "python",
+      "args": [
+        "c:/Users/luisa/Documents/PS6/aws_proyecto/backend_aws/.agents/skills/drawio-aws4-mcp/scripts/drawio_aws4_mcp_server.py"
+      ],
+      "env": {
+        "PYTHONIOENCODING": "utf-8"
+      }
+    }
+  }
+}
+

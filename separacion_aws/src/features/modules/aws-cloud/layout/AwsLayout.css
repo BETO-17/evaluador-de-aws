@@ -1,0 +1,544 @@
+/* ==========================================
+   CloudOps / AWS Layout Stylesheet
+   Colores exactos requeridos:
+   - Fondo principal: #F8FAFC
+   - Sidebar: #0F172A
+   - Color principal / acciones: #2563EB
+   - Seguridad / éxito: #16A34A
+   - Costos / advertencia: #F59E0B
+   - Alertas / error: #DC2626
+   - Texto principal: #1E293B
+   - Texto secundario: #64748B
+   - Bordes: #E2E8F0
+   - Cards: #FFFFFF
+   ========================================== */
+
+/* Layout Container & Main Background */
+.admin-layout.aws-theme-layout,
+.admin-layout:has(.aws-sidebar),
+.admin-layout:has(.aws-admin-sidebar) {
+  background: #F8FAFC !important;
+}
+
+/* Sidebar Background */
+.aws-sidebar,
+.aws-admin-sidebar {
+  background: #0F172A !important;
+  border-right: 1px solid rgba(226, 232, 240, 0.08) !important;
+}
+
+/* Brand Header matching CloudOps Reference */
+.cloudops-sidebar-header {
+  padding: 24px 20px 20px !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.08) !important;
+  background: #0F172A !important;
+}
+
+.cloudops-brand {
+  display: flex !important;
+  align-items: center !important;
+  gap: 13px !important;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.cloudops-brand:hover {
+  opacity: 0.94;
+  transform: translateX(1px);
+}
+
+.cloudops-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.cloudops-icon {
+  filter: drop-shadow(0 0 6px rgba(37, 99, 235, 0.45));
+}
+
+.cloudops-text-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cloudops-title {
+  color: #FFFFFF !important;
+  font-size: 21px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.5px !important;
+  line-height: 1.1 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif !important;
+}
+
+.cloudops-dot {
+  color: #2563EB !important;
+  font-weight: 900 !important;
+}
+
+.cloudops-subtitle {
+  color: #64748B !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.16em !important;
+  text-transform: uppercase !important;
+  margin-top: 4px !important;
+  line-height: 1 !important;
+}
+
+/* Sidebar Navigation Items */
+.aws-sidebar .sidebar-nav-item,
+.aws-admin-sidebar .sidebar-nav-item {
+  color: #94A3B8 !important;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.aws-sidebar .sidebar-nav-item:hover,
+.aws-admin-sidebar .sidebar-nav-item:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #FFFFFF !important;
+}
+
+.aws-sidebar .sidebar-nav-item.active,
+.aws-admin-sidebar .sidebar-nav-item.active {
+  background: rgba(37, 99, 235, 0.16) !important;
+  color: #FFFFFF !important;
+  border-left: 3px solid #2563EB !important;
+  font-weight: 700 !important;
+}
+
+.aws-sidebar .sidebar-nav-item.active .nav-icon,
+.aws-admin-sidebar .sidebar-nav-item.active .nav-icon {
+  color: #2563EB !important;
+}
+
+/* Sidebar Environment Status & Action Buttons */
+.cloudops-env-badge {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(226, 232, 240, 0.12);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 11.5px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.cloudops-env-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cloudops-env-label {
+  color: #64748B;
+}
+
+.cloudops-env-val {
+  font-weight: 700;
+}
+
+.cloudops-btn-reset {
+  flex: 1;
+  background: rgba(220, 38, 38, 0.12);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  color: #DC2626;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  fontWeight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.cloudops-btn-reset:hover {
+  background: rgba(220, 38, 38, 0.22);
+}
+
+.cloudops-btn-demo {
+  flex: 1;
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  color: #2563EB;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  fontWeight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+}
+
+.cloudops-btn-demo:hover {
+  background: rgba(37, 99, 235, 0.22);
+}
+
+/* Content Area & Topbar */
+.aws-theme-layout .admin-content,
+.admin-layout:has(.aws-sidebar) .admin-content,
+.admin-layout:has(.aws-admin-sidebar) .admin-content {
+  background: #F8FAFC !important;
+}
+
+.aws-theme-layout .admin-topbar,
+.admin-layout:has(.aws-sidebar) .admin-topbar,
+.admin-layout:has(.aws-admin-sidebar) .admin-topbar {
+  background: #FFFFFF !important;
+  border-bottom: 1px solid #E2E8F0 !important;
+}
+
+.aws-theme-layout .admin-main,
+.admin-layout:has(.aws-sidebar) .admin-main,
+.admin-layout:has(.aws-admin-sidebar) .admin-main {
+  background: #F8FAFC !important;
+}
+
+/* ==========================================
+   CloudOps Topbar Right Cluster (Image 2 & 3)
+   ========================================== */
+.cloudops-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* 1. Region Selector: [Globe] us-east-1 [ChevronDown] */
+.topbar-region-wrap {
+  position: relative;
+}
+
+.topbar-region-btn {
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  padding: 6px 8px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  color: #1E293B;
+  user-select: none;
+}
+
+.topbar-region-btn:hover {
+  background: #F1F5F9;
+}
+
+.topbar-region-code {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #1E293B;
+  letter-spacing: -0.2px;
+}
+
+.topbar-region-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+  width: 290px;
+  max-height: 320px;
+  overflow-y: auto;
+  z-index: 1000;
+  padding: 6px;
+  animation: dropdownFadeIn 0.18s ease-out;
+}
+
+.topbar-region-menu-title {
+  padding: 8px 12px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #F1F5F9;
+  margin-bottom: 4px;
+}
+
+.topbar-region-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.topbar-region-item:hover {
+  background: #F8FAFC;
+}
+
+.topbar-region-item.active {
+  background: #EFF6FF;
+}
+
+.topbar-region-item-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar-region-item-code {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #1E293B;
+}
+
+.topbar-region-item.active .topbar-region-item-code {
+  color: #2563EB;
+}
+
+.topbar-region-item-name {
+  font-size: 11px;
+  color: #64748B;
+}
+
+.topbar-region-item-latency {
+  font-size: 11px;
+  font-weight: 700;
+  color: #16A34A;
+}
+
+/* 2. AI Assistant Button [IA] with soft pastel styling from Image 3 */
+.topbar-ai-pill-btn {
+  background: #FDF2F8; /* Soft blush tint matching Image 3 */
+  border: 1px solid #BFDBFE;
+  border-radius: 10px;
+  padding: 6px 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #2563EB;
+  font-size: 13.5px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.topbar-ai-pill-btn:hover {
+  background: #EFF6FF;
+  border-color: #93C5FD;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+  transform: translateY(-1px);
+}
+
+.topbar-ai-pill-btn.active {
+  background: #2563EB;
+  color: #FFFFFF;
+  border-color: #2563EB;
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.35);
+}
+
+.topbar-ai-pill-btn.active svg {
+  color: #FFFFFF !important;
+}
+
+/* 3. Theme Toggle */
+.topbar-icon-action-btn {
+  background: transparent;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #475569;
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.topbar-icon-action-btn:hover {
+  background: #F1F5F9;
+  color: #1E293B;
+}
+
+/* 4. Notification Bell */
+.topbar-bell-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #DC2626;
+  color: #FFFFFF;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+  box-shadow: 0 1px 3px rgba(220, 38, 38, 0.4);
+}
+
+/* 5. User Avatar [(JM)] from Image 3 */
+.topbar-avatar-jm-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #FCE7F3; /* Soft subtle blush/pink tint from Image 3 */
+  border: 1.5px solid #BFDBFE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #2563EB;
+  font-weight: 700;
+  font-size: 13px;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.topbar-avatar-jm-btn:hover {
+  border-color: #2563EB;
+  box-shadow: 0 0 10px rgba(37, 99, 235, 0.2);
+  transform: scale(1.04);
+}
+
+/* ==========================================
+   Responsive Sidebar & Mobile Header Styling
+   ========================================== */
+
+/* Hamburger Button */
+.aws-hamburger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  width: 38px;
+  height: 38px;
+  cursor: pointer;
+  color: #1e293b;
+  transition: all 0.15s ease;
+}
+
+.aws-hamburger-btn:hover {
+  background: #f1f5f9;
+}
+
+/* Sidebar Close Button */
+.aws-sidebar-close-btn {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  color: #94a3b8;
+  transition: all 0.15s ease;
+}
+
+.aws-sidebar-close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Mobile Overlay Backdrop */
+.aws-mobile-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  animation: fadeInBackdrop 0.2s ease-out;
+}
+
+@keyframes fadeInBackdrop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInSidebar {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+/* Breakpoint: Less than 1024px (Mobile and Tablet) */
+@media (max-width: 1023px) {
+  .aws-sidebar {
+    display: none !important;
+  }
+
+  .aws-sidebar.mobile-open {
+    display: flex !important;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px !important;
+    z-index: 10001 !important;
+    box-shadow: 10px 0 35px rgba(0, 0, 0, 0.5) !important;
+    animation: slideInSidebar 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  .aws-mobile-backdrop {
+    display: block !important;
+  }
+
+  .aws-hamburger-btn {
+    display: flex !important;
+  }
+
+  .aws-sidebar-close-btn {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .admin-topbar {
+    padding: 0 16px !important;
+  }
+
+  .admin-main {
+    padding: 18px 16px !important;
+  }
+}
+
+/* Breakpoint: Small Mobile (Less than 640px) */
+@media (max-width: 639px) {
+  .aws-hide-mobile {
+    display: none !important;
+  }
+
+  .admin-topbar {
+    padding: 0 12px !important;
+  }
+
+  .cloudops-topbar-right {
+    gap: 6px !important;
+  }
+
+  .topbar-region-btn {
+    padding: 6px 8px !important;
+  }
+
+  .admin-main {
+    padding: 14px 12px !important;
+  }
+}
+
